@@ -572,7 +572,10 @@ We will grade based on your implementation.
 
 
 
-
+Question:
+1. transition？
+2. block同时创建可能冲突，。。。。（。。dsad ）
+3. bonus  溢出加分吗？
 
 
 
