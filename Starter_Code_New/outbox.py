@@ -242,7 +242,7 @@ def send_message(ip, port, message):
     # Wrap the function `send_message` with the dynamic network condition in the function `apply_network_condition` of `link_simulator.py`.
     # pass
 
-send_message = apply_network_conditions(send_message)
+# send_message = apply_network_conditions(send_message)
 
 def apply_network_conditions(send_func):
     def wrapper(ip, port, message):
