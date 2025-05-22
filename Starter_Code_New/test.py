@@ -91,10 +91,10 @@ def main():
 #    print(f"[{self_id}] Starting dashboard on port {port + 2000}", flush=True)
 #    start_dashboard(self_id, port + 2000)
 
-#    print(f"[{self_id}] Node is now running at {ip}:{port}", flush=True)
-#    while True:
-#       print(f"[{self_id}] Still alive at {time.strftime('%X')}", flush=True)
-#       time.sleep(60)
+    print(f"[{self_id}] Node is now running at {ip}:{port}", flush=True)
+    while True:
+       print(f"[{self_id}] Still alive at {time.strftime('%X')}", flush=True)
+       time.sleep(60)
 
 if __name__ == "__main__":
     try:
