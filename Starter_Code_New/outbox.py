@@ -72,25 +72,49 @@ rate_limiter = RateLimiter()
 
 def enqueue_message(target_id, ip, port, message):
     from peer_manager import blacklist, rtt_tracker
-
+    
     # TODO: Check if the peer sends message to the receiver too frequently using the function `is_rate_limited`. If yes, drop the message.
-  
+    
+    # Get the message type
+    msg_type = message.get("type")
+    if msg_type not in drop_stats:
+        msg_type = "OTHER"  # ???
+    if is_rate_limited(target_id):
+        drop_stats[msg_type] += 1
+        return
     # TODO: Check if the receiver exists in the `blacklist`. If yes, drop the message.
-  
+    if target_id in blacklist:
+        drop_stats[msg_type] += 1
+        return
     # TODO: Classify the priority of the sending messages based on the message type using the function `classify_priority`.
-  
+    priority = classify_priority(message)
     # TODO: Add the message to the queue (`queues`) if the length of the queue is within the limit `QUEUE_LIMIT`, or otherwise, drop the message.
-    pass
+    with lock:
+        if len(queues[target_id][priority]) < QUEUE_LIMIT:
+            queues[target_id][priority].append(message)
+        else:
+            drop_stats[msg_type] += 1
+            return
+    # pass
 
 
 def is_rate_limited(peer_id):
     # TODO:Check how many messages were sent from the peer to a target peer during the `TIME_WINDOW` that ends now.
-  
+    
     # TODO: If the sending frequency exceeds the sending rate limit `RATE_LIMIT`, return `TRUE`; otherwise, record the current sending time into `peer_send_timestamps`.
     pass
 
 def classify_priority(message):
     # TODO: Classify the priority of a message based on the message type.
+    msg_type = message.get("type")
+    if msg_type in PRIORITY_HIGH:
+        return "high"
+    elif msg_type in PRIORITY_MEDIUM:
+        return "medium"
+    elif msg_type in PRIORITY_LOW:
+        return "low"
+    else:
+        return "low" #???
     pass
 
 
