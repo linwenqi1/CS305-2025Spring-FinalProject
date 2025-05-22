@@ -63,6 +63,7 @@ def dispatch_message(msg, self_id, self_ip):
 
     elif msg_type == "HELLO":
         # TODO: Call the function `handle_hello_message` in `peer_discovery.py` to process the message.
+        handle_hello_message(msg, self_id)
         pass
 
     elif msg_type == "BLOCK":
