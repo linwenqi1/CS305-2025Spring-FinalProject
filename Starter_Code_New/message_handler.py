@@ -43,7 +43,7 @@ def get_redundancy_stats():
 # === Main Message Dispatcher ===
 def dispatch_message(msg, self_id, self_ip):
     
-    msg_type = msg.get["type"]
+    msg_type = msg.get("type")
 
     # TODO: Read the message.
 
@@ -88,21 +88,24 @@ def dispatch_message(msg, self_id, self_ip):
         pass
 
     elif msg_type == "PING":
-        
-        # TODO: Update the last ping time using the function `update_peer_heartbeat` in `peer_manager.py`.
-        
-        # TODO: Create a `pong` message using the function `create_pong` in `peer_manager.py`.
-        
-        # TODO: Send the `pong` message to the sender using the function `enqueue_message` in `outbox.py`.
+        id = msg.get("id")
+        tt = msg.get("tt")
 
+        # TODO: Update the last ping time using the function `update_peer_heartbeat` in `peer_manager.py`.
+        update_peer_heartbeat(id)
+        # TODO: Create a `pong` message using the function `create_pong` in `peer_manager.py`.
+        pong = create_pong(self_id,tt)
+        # TODO: Send the `pong` message to the sender using the function `enqueue_message` in `outbox.py`.
+        enqueue_message(id,known_peers[id][0],known_peers[id][1],pong)
         pass
 
     elif msg_type == "PONG":
-        
+        id = msg.get("id")
+        tt = msg.get("tt")
         # TODO: Update the last ping time using the function `update_peer_heartbeat` in `peer_manager.py`.
-        
+        update_peer_heartbeat(id)
         # TODO: Call the function `handle_pong` in `peer_manager.py` to handle the message.
-
+        handle_pong(msg)
         pass
 
     elif msg_type == "INV":

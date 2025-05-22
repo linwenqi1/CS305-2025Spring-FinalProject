@@ -92,7 +92,25 @@ def is_rate_limited(peer_id):
 def classify_priority(message):
     # TODO: Classify the priority of a message based on the message type.
     pass
-    
+
+
+import struct
+
+def send_json(sock, json_obj):
+    """
+    发送JSON对象到socket连接
+    :param sock: 已建立的socket连接
+    :param json_obj: 要发送的Python对象(可序列化为JSON)
+    """
+    # 将对象序列化为JSON字符串
+    json_str = json.dumps(json_obj)
+    # 转换为字节流
+    json_bytes = json_str.encode('utf-8')
+
+    # 先发送数据长度(4字节网络字节序)
+    sock.sendall(struct.pack('!I', len(json_bytes)))
+    # 发送实际数据
+    sock.sendall(json_bytes)
 
 def send_from_queue(self_id):
     def worker():
