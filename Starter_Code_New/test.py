@@ -21,7 +21,7 @@ def main():
     # Import the peer's configuration from command line
     parser = argparse.ArgumentParser()
     parser.add_argument("--id", required=True)
-    parser.add_argument("--config", defidault="config_test.json")
+    parser.add_argument("--config", default="config_test.json")
     parser.add_argument("--fanout", type=int, help="Override fanout for this peer")
     parser.add_argument("--mode", default="normal", help="Node mode: normal or malicious")
     args = parser.parse_args()
