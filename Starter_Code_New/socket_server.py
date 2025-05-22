@@ -10,7 +10,10 @@ def start_socket_server(self_id, self_ip, port):
 
     def listen_loop():
         # TODO: Create a TCP socket and bind it to the peer’s IP address and port.
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # allow the server to quickly reuse the port after it is closed
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self_ip, port))
 
         # TODO: Start listening on the socket for receiving incoming messages.
@@ -20,7 +23,7 @@ def start_socket_server(self_id, self_ip, port):
         while True:
             try:
                 conn, addr = sock.accept()
-                threading.Thread(target=recv_message(conn,self_id,self_ip), daemon=True).start()
+                threading.Thread(target=recv_message, args=(conn, self_id, self_ip), daemon=True).start()
             except Exception as e:
                 print(f"[ERROR] Failed to accept connection: {e}")
 
