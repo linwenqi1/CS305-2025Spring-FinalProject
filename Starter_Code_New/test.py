@@ -9,7 +9,7 @@ from peer_discovery import start_peer_discovery, known_peers, peer_flags, peer_c
 # from block_handler import block_generation, request_block_sync
 # from message_handler import cleanup_seen_messages
 from socket_server import start_socket_server
-# from dashboard import start_dashboard
+from dashboard import start_dashboard
 from peer_manager import start_peer_monitor, start_ping_loop
 from outbox import send_from_queue
 # from link_simulator import start_dynamic_capacity_adjustment
@@ -86,10 +86,10 @@ def main():
 #    start_dynamic_capacity_adjustment()
 
     # Start dashboard
-#    time.sleep(2)
-#    print(f"[{self_id}] Known peers before dashboard start: {known_peers}", flush=True)
-#    print(f"[{self_id}] Starting dashboard on port {port + 2000}", flush=True)
-#    start_dashboard(self_id, port + 2000)
+    time.sleep(2)
+    print(f"[{self_id}] Known peers before dashboard start: {known_peers}", flush=True)
+    print(f"[{self_id}] Starting dashboard on port {port + 2000}", flush=True)
+    start_dashboard(self_id, port + 2000)
 
     print(f"[{self_id}] Node is now running at {ip}:{port}", flush=True)
     while True:

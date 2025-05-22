@@ -13,7 +13,7 @@ def start_socket_server(self_id, self_ip, port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # allow the server to quickly reuse the port after it is closed
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        # sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self_ip, port))
 
         # TODO: Start listening on the socket for receiving incoming messages.
@@ -34,6 +34,10 @@ def start_socket_server(self_id, self_ip, port):
 def recv_message(conn,self_id,self_ip):
     while True:
         json_obj = recv_json(conn)
+        if json_obj is None:
+            print(f"[INFO] Connection closed from {conn.getpeername()}")
+            break
+        print(f"[INFO] Received message from {conn.getpeername()}: {json_obj}")
         dispatch_message(json_obj, self_id, self_ip)
 
 import struct

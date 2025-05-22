@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from threading import Thread
 from peer_manager import peer_status, rtt_tracker
 from transaction import get_recent_transactions
-from link_simulator import rate_limiter
+# from link_simulator import rate_limiter
 from message_handler import get_redundancy_stats
 from peer_discovery import known_peers
 import json
@@ -32,7 +32,26 @@ def blocks():
 @app.route('/peers')
 def peers():
     # TODO: display the information of known peers, including `{peer's ID, IP address, port, status, NATed or non-NATed, lightweight or full}`.
-    pass
+    # Display the information of known peers
+    from peer_discovery import known_peers, peer_flags
+    from peer_manager import peer_status
+
+    peers_info = []
+    for peer_id, (ip, port) in known_peers.items():
+        flags = peer_flags.get(peer_id, {})
+        status = peer_status.get(peer_id, "unknown")
+        peer_data = {
+            "id": peer_id,
+            "ip": ip,
+            "port": port,
+            "status": status,
+            "NATed": flags.get("nat", False),
+            "lightweight": flags.get("light", False),
+            "type": "full" if not flags.get("light", False) else "lightweight"
+        }
+        peers_info.append(peer_data)
+    return jsonify(peers_info)
+    # pass
 
 @app.route('/transactions')
 def transactions():

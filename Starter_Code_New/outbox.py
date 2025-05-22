@@ -77,6 +77,8 @@ def enqueue_message(target_id, ip, port, message):
     
     # Get the message type
     msg_type = message.get("type")
+    if msg_type == "HELLO":
+        print(f"[INFO] HELLO is add to the queue")
     if msg_type not in drop_stats:
         msg_type = "OTHER"  # ???
     if is_rate_limited(target_id):
@@ -138,18 +140,17 @@ def send_json(sock, json_obj):
     json_bytes = json_str.encode('utf-8')
 
     # 先发送数据长度(4字节网络字节序)
-    sock.sendall(struct.pack('!I', len(json_bytes)))
+    sock.sendall(struct.pack('!I', len(json_bytes)) + json_bytes)
     # 发送实际数据
-    sock.sendall(json_bytes)
+    # sock.sendall(json_bytes)
 
 def send_from_queue(self_id):
     def worker():
-        
         # TODO: Read the message in the queue. Each time, read one message with the highest priority of a target peer. After sending the message, read the message of the next target peer. This ensures the fairness of sending messages to different target peers.
         while True:
             peer_ids = list(queues.keys())
             if not peer_ids:
-                time.sleep(0.1) # ???
+                # time.sleep(0.1) # ???
                 continue
             for target_id in peer_ids:
                 message = None
@@ -172,7 +173,7 @@ def send_from_queue(self_id):
                     if msg_type not in drop_stats:
                         msg_type = "OTHER"
                     drop_stats[msg_type] += 1
-            time.sleep(0.1)  # Sleep for a short time to avoid busy waiting
+            # time.sleep(0.1)  # Sleep for a short time to avoid busy waiting
                     
         # TODO: Send the message using the function `relay_or_direct_send`, which will decide whether to send the message to target peer directly or through a relaying peer.
 
@@ -185,12 +186,13 @@ def relay_or_direct_send(self_id, dst_id, message):
     from peer_discovery import known_peers, peer_flags
 
     # TODO: Check if the target peer is NATed. 
-    is_nated = peer_flags[dst_id].get("nat", False)
+    # is_nated = peer_flags[dst_id].get("nat", False)
 
     # TODO: If the target peer is NATed, use the function `get_relay_peer` to find the best relaying peer. 
     # Define the JSON format of a `RELAY` message, which should include `{message type, sender's ID, target peer's ID, `payload`}`. 
     # `payload` is the sending message. 
     # Send the `RELAY` message to the best relaying peer using the function `send_message`.
+    is_nated = False
     if is_nated:
         relay_peer = get_relay_peer(self_id, dst_id)
         if relay_peer is not None:
@@ -236,8 +238,13 @@ def send_message(ip, port, message):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((ip, port))
             send_json(sock, message)
+        print(f"[INFO] Sent message to {ip}:{port} - {message}")
+        return True
+    except ConnectionRefusedError:
+        print(f"[ERROR] Connection refused to {ip}:{port}")
         return True
     except Exception as e:
+        print(f"[ERROR] Failed to send message to {ip}:{port} - {e}")
         return False
     # Wrap the function `send_message` with the dynamic network condition in the function `apply_network_condition` of `link_simulator.py`.
     # pass

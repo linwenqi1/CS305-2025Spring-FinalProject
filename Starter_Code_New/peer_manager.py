@@ -31,7 +31,7 @@ def start_ping_loop(self_id, peer_table):
                 ping = ping_json_gen("PING", self_id, time.time())
                 enqueue_message(peer,peers[peer][0], peers[peer][1], ping)
 
-            time.sleep(1) #？？？
+            time.sleep(5) #？？？
         pass
     threading.Thread(target=loop, daemon=True).start()
 
