@@ -52,7 +52,7 @@ def handle_pong(msg):
     rtt_tracker[sender_id] = time.time() - recv_ts
 
 
-LIMIT = 0.5  #？？？
+LIMIT = 10  #？？？
 def start_peer_monitor():
     import threading
     def loop():
@@ -65,7 +65,7 @@ def start_peer_monitor():
                 else:
                     peer_status[peer_id] = "ALIVE"
             time.sleep(1) #??
-            print("peer_status:", peer_status)
+            # print("peer_status:", peer_status)
 
     threading.Thread(target=loop, daemon=True).start()
 
