@@ -57,14 +57,15 @@ def start_peer_monitor():
     import threading
     def loop():
         # TODO: Check the latest time to receive `ping` or `pong` message from each peer in `last_ping_time`.
-
-        # TODO: If the latest time is earlier than the limit, mark the peer's status in `peer_status` as `UNREACHABLE` or otherwise `ALIVE`.
-        for peer_id in last_ping_time:
-            if time.time() - last_ping_time[peer_id] > LIMIT:
-                peer_status[peer_id] = "UNREACHABLE"
-            else:
-                peer_status[peer_id] = "ALIVE"
-        time.sleep(0.1) #??
+        while True:
+            # TODO: If the latest time is earlier than the limit, mark the peer's status in `peer_status` as `UNREACHABLE` or otherwise `ALIVE`.
+            for peer_id in last_ping_time:
+                if time.time() - last_ping_time[peer_id] > LIMIT:
+                    peer_status[peer_id] = "UNREACHABLE"
+                else:
+                    peer_status[peer_id] = "ALIVE"
+            time.sleep(1) #??
+            print("peer_status:", peer_status)
 
     threading.Thread(target=loop, daemon=True).start()
 
