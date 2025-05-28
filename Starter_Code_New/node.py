@@ -6,7 +6,7 @@ import argparse
 import time
 import traceback
 from peer_discovery import start_peer_discovery, known_peers, peer_flags, peer_config
-from block_handler import block_generation, request_block_sync
+from block_handler import block_generation, request_block_sync,initialize_blockchain
 #from message_handler import cleanup_seen_messages
 from socket_server import start_socket_server
 from dashboard import start_dashboard
@@ -72,6 +72,7 @@ def main():
 
     if not self_info.get('light', False):
         print(f"[{self_id}] Starting transaction and block generation", flush=True)
+        initialize_blockchain()
         transaction_generation(self_id)
         block_generation(self_id, MALICIOUS_MODE)
 

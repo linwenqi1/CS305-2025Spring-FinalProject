@@ -7,9 +7,9 @@ from collections import defaultdict
 from peer_discovery import handle_hello_message, known_peers, peer_config
 from block_handler import handle_block, get_block_by_id, create_getblock, received_blocks, header_store
 from inv_message import  create_inv, get_inventory
-from block_handler import create_getblock
+from block_handler import create_getblock,Block
 from peer_manager import  update_peer_heartbeat, record_offense, create_pong, handle_pong
-from transaction import add_transaction
+from transaction import add_transaction,from_dict
 from outbox import enqueue_message, gossip_message
 
 
@@ -68,24 +68,39 @@ def dispatch_message(msg, self_id, self_ip):
 
     elif msg_type == "BLOCK":
         # TODO: Check the correctness of block ID. If incorrect, record the sender's offence using the function `record_offence` in `peer_manager.py`.
-        
+        block = Block.from_dict(msg)
+        expected_block_id = Block.compute_hash(block)
+        received_block_id = block.block_id
+        if expected_block_id != received_block_id:
+            print(f"[{self_id}] Received block with incorrect ID: {received_block_id}, expected: {expected_block_id}. Dropping block and recording offense.")
+            record_offense(block.peer_id, "Incorrect block ID")
+            return
         # TODO: Call the function `handle_block` in `block_handler.py` to process the block.
-        
+        handle_block(msg, self_id)
         # TODO: Call the function `create_inv` to create an `INV` message for the block.
-        
+        inv = create_inv(self_id, [block.block_id])
         # TODO: Broadcast the `INV` message to known peers using the function `gossip_message` in `outbox.py`.
-
+        gossip_message(self_id, inv, fanout=peer_config[self_id].get("fanout", 3))
         pass
 
 
     elif msg_type == "TX":
         
         # TODO: Check the correctness of transaction ID. If incorrect, record the sender's offence using the function `record_offence` in `peer_manager.py`.
+        parsed_tx  = from_dict(msg)
+        expected = parsed_tx.compute_hash()
+        if expected != msg.get("id"):
+            record_offense(msg.get("id"), "Invalid transaction ID")
+            return
         
         # TODO: Add the transaction to `tx_pool` using the function `add_transaction` in `transaction.py`.
-        
-        # TODO: Broadcast the transaction to known peers using the function `gossip_message` in `outbox.py`.
+        added = add_transaction(parsed_tx)
 
+        # TODO: Broadcast the transaction to known peers using the function `gossip_message` in `outbox.py`.
+        if added: #success
+            gossip_message(self_id, parsed_tx.to_dict(), fanout=peer_config[self_id].get("fanout", 3))
+        else: #failed
+            print(f"[{self_id}] Transaction {parsed_tx.id} already exists in the pool, not broadcasting.", flush=True)
         pass
 
     elif msg_type == "PING":
